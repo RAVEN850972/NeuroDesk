@@ -166,7 +166,7 @@ def get_desk():
     """Получение экземпляра NeuroDesk с ленивой инициализацией."""
     global desk
     if desk is None:
-        openai_key = "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"
+        openai_key = "API ONPEN AI KEY"
         desk = SimpleNeuroDesk(openai_api_key=openai_key)
     return desk
 
