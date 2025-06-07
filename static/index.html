@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NeuroDesk Hybrid — ИИ Ассистент</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent-graph: #4CAF50;
+            --accent-openai: #FF9800;
+            --accent-error: #f44336;
+            --accent-blue: #2196F3;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-graph), var(--accent-openai));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .input-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            flex: 1;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select {
+            min-height: auto;
+            height: 44px;
+        }
+
+        textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .source-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .source-graph {
+            background: var(--accent-graph);
+            color: white;
+        }
+
+        .source-openai {
+            background: var(--accent-openai);
+            color: white;
+        }
+
+        .source-error {
+            background: var(--accent-error);
+            color: white;
+        }
+
+        .confidence-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .confidence-fill {
+            width: 60px;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .confidence-value {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-error), var(--accent-openai), var(--accent-graph));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .response-content {
+            color: var(--text-primary);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-bottom: 1rem;
+        }
+
+        .response-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .meta-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
+        .explanation {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .explanation h4 {
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .explanation ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .explanation li {
+            padding: 0.3rem 0;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .explanation li:before {
+            content: "•";
+            color: var(--accent-blue);
+            position: absolute;
+            left: 0;
+        }
+
+        .feedback-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .feedback-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .feedback-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .feedback-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .feedback-btn.positive {
+            border-color: var(--accent-graph);
+            color: var(--accent-graph);
+        }
+
+        .feedback-btn.negative {
+            border-color: var(--accent-error);
+            color: var(--accent-error);
+        }
+
+        .feedback-btn.selected {
+            background: currentColor;
+            color: white;
+        }
+
+        .stats-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            margin-top: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--accent-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid var(--accent-openai);
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            color: var(--accent-openai);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .response-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NeuroDesk Hybrid</h1>
+            <p class="subtitle">Персональный ИИ-ассистент с гибридной архитектурой</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="prompt">Ваш вопрос:</label>
+                    <textarea id="prompt" placeholder="Задайте любой вопрос..."></textarea>
+                </div>
+                <div class="input-group" style="flex: 0 0 200px;">
+                    <label for="domain">Предметная область:</label>
+                    <select id="domain">
+                        <option value="general">Общая</option>
+                        <option value="programming">Программирование</option>
+                        <option value="science">Наука</option>
+                        <option value="technology">Технологии</option>
+                        <option value="medicine">Медицина</option>
+                        <option value="education">Образование</option>
+                        <option value="business">Бизнес</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button id="askBtn" class="btn-primary">
+                    <span class="btn-text">Спросить</span>
+                    <span class="loading" style="display: none;"></span>
+                </button>
+                <button id="learnBtn" class="btn-secondary">Обучить систему</button>
+                <button id="statsBtn" class="btn-secondary">Статистика</button>
+            </div>
+        </div>
+
+        <div id="responseSection" class="response-section">
+            <div class="response-header">
+                <div id="sourceBadge" class="source-badge"></div>
+                <div id="confidenceBar" class="confidence-bar">
+                    <span>Уверенность:</span>
+                    <div class="confidence-fill">
+                        <div id="confidenceValue" class="confidence-value"></div>
+                    </div>
+                    <span id="confidenceText">0%</span>
+                </div>
+            </div>
+            
+            <div id="responseContent" class="response-content"></div>
+            
+            <div id="responseMeta" class="response-meta" style="display: none;">
+                <div class="meta-item">
+                    <div id="processingTime" class="meta-value">0ms</div>
+                    <div class="meta-label">Время обработки</div>
+                </div>
+                <div class="meta-item">
+                    <div id="componentsUsed" class="meta-value">0</div>
+                    <div class="meta-label">Компонентов использовано</div>
+                </div>
+                <div class="meta-item">
+                    <div id="tokensUsed" class="meta-value">-</div>
+                    <div class="meta-label">Токенов OpenAI</div>
+                </div>
+            </div>
+
+            <div id="explanation" class="explanation" style="display: none;">
+                <h4>Объяснение процесса:</h4>
+                <ul id="explanationList"></ul>
+            </div>
+
+            <div id="warnings" class="warning" style="display: none;"></div>
+
+            <div class="feedback-section">
+                <span class="feedback-label">Оцените ответ:</span>
+                <div class="feedback-buttons">
+                    <button class="feedback-btn negative" data-feedback="-1" title="Плохо">👎</button>
+                    <button class="feedback-btn" data-feedback="0" title="Нейтрально">🤷</button>
+                    <button class="feedback-btn positive" data-feedback="1" title="Хорошо">👍</button>
+                </div>
+                <span id="feedbackStatus" style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 1rem;"></span>
+            </div>
+        </div>
+
+        <div id="statsSection" class="stats-section" style="display: none;">
+            <h3 style="margin-bottom: 1rem; color: var(--accent-blue);">Статистика системы</h3>
+            <div id="statsGrid" class="stats-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        class NeuroDesk {
+            constructor() {
+                this.currentResponse = null;
+                this.selectedFeedback = null;
+                this.initializeElements();
+                this.bindEvents();
+                this.loadStats();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    prompt: document.getElementById('prompt'),
+                    domain: document.getElementById('domain'),
+                    askBtn: document.getElementById('askBtn'),
+                    learnBtn: document.getElementById('learnBtn'),
+                    statsBtn: document.getElementById('statsBtn'),
+                    responseSection: document.getElementById('responseSection'),
+                    sourceBadge: document.getElementById('sourceBadge'),
+                    confidenceBar: document.getElementById('confidenceBar'),
+                    confidenceValue: document.getElementById('confidenceValue'),
+                    confidenceText: document.getElementById('confidenceText'),
+                    responseContent: document.getElementById('responseContent'),
+                    responseMeta: document.getElementById('responseMeta'),
+                    processingTime: document.getElementById('processingTime'),
+                    componentsUsed: document.getElementById('componentsUsed'),
+                    tokensUsed: document.getElementById('tokensUsed'),
+                    explanation: document.getElementById('explanation'),
+                    explanationList: document.getElementById('explanationList'),
+                    warnings: document.getElementById('warnings'),
+                    feedbackStatus: document.getElementById('feedbackStatus'),
+                    statsSection: document.getElementById('statsSection'),
+                    statsGrid: document.getElementById('statsGrid')
+                };
+            }
+
+            bindEvents() {
+                this.elements.askBtn.addEventListener('click', () => this.ask());
+                this.elements.learnBtn.addEventListener('click', () => this.learn());
+                this.elements.statsBtn.addEventListener('click', () => this.toggleStats());
+                
+                this.elements.prompt.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        this.ask();
+                    }
+                });
+
+                // Обратная связь
+                document.querySelectorAll('.feedback-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.giveFeedback(parseInt(btn.dataset.feedback)));
+                });
+            }
+
+            async ask() {
+                const prompt = this.elements.prompt.value.trim();
+                if (!prompt) {
+                    alert('Введите вопрос!');
+                    return;
+                }
+
+                this.setLoading(true);
+                this.elements.responseSection.style.display = 'none';
+
+                try {
+                    const response = await fetch('/ask', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: prompt,
+                            domain: this.elements.domain.value,
+                            feedback: this.selectedFeedback
+                        })
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                    const data = await response.json();
+                    this.displayResponse(data);
+                    this.selectedFeedback = null;
+                    this.clearFeedbackSelection();
+
+                } catch (error) {
+                    this.displayError(error.message);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            async learn() {
+                const text = this.elements.prompt.value.trim();
+                if (!text || text.length < 10) {
+                    alert('Введите текст для обучения (минимум 10 символов)!');
+                    return;
+                }
+
+                this.setLoading(true, 'learnBtn');
+
+                try {
+                    const response = await fetch('/learn', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            text: text,
+                            domain: this.elements.domain.value
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.displayLearningResult(data);
+                    } else {
+                        throw new Error(data.error || 'Ошибка обучения');
+                    }
+
+                } catch (error) {
+                    this.displayError(`Ошибка обучения: ${error.message}`);
+                } finally {
+                    this.setLoading(false, 'learnBtn');
+                }
+            }
+
+            async loadStats() {
+                try {
+                    const response = await fetch('/stats');
+                    const stats = await response.json();
+                    this.updateStatsDisplay(stats);
+                } catch (error) {
+                    console.error('Ошибка загрузки статистики:', error);
+                }
+            }
+
+            async toggleStats() {
+                if (this.elements.statsSection.style.display === 'none') {
+                    await this.loadStats();
+                    this.elements.statsSection.style.display = 'block';
+                    this.elements.statsBtn.textContent = 'Скрыть статистику';
+                } else {
+                    this.elements.statsSection.style.display = 'none';
+                    this.elements.statsBtn.textContent = 'Статистика';
+                }
+            }
+
+            async giveFeedback(feedback) {
+                if (!this.currentResponse) return;
+
+                this.selectedFeedback = feedback;
+                this.updateFeedbackSelection(feedback);
+
+                // Отправляем повторный запрос с обратной связью
+                this.elements.feedbackStatus.textContent = 'Применяем обратную связь...';
+                
+                try {
+                    await this.ask();
+                    this.elements.feedbackStatus.textContent = 'Обратная связь учтена ✓';
+                    setTimeout(() => {
+                        this.elements.feedbackStatus.textContent = '';
+                    }, 3000);
+                } catch (error) {
+                    this.elements.feedbackStatus.textContent = 'Ошибка применения обратной связи';
+                }
+            }
+
+            displayResponse(data) {
+                this.currentResponse = data;
+                
+                // Источник ответа
+                this.elements.sourceBadge.textContent = this.getSourceText(data.source);
+                this.elements.sourceBadge.className = `source-badge source-${data.source.replace('_', '-')}`;
+
+                // Уверенность
+                const confidence = data.confidence || 0;
+                this.elements.confidenceValue.style.width = `${confidence * 100}%`;
+                this.elements.confidenceText.textContent = `${Math.round(confidence * 100)}%`;
+
+                // Контент
+                this.elements.responseContent.textContent = data.answer;
+
+                // Метаданные
+                if (data.processing_time || data.components_used || data.tokens_used) {
+                    this.elements.processingTime.textContent = 
+                        data.processing_time ? `${Math.round(data.processing_time * 1000)}ms` : '-';
+                    this.elements.componentsUsed.textContent = 
+                        data.components_used ? data.components_used.length : 0;
+                    this.elements.tokensUsed.textContent = data.tokens_used || '-';
+                    this.elements.responseMeta.style.display = 'grid';
+                }
+
+                // Объяснение
+                if (data.explanation && data.explanation.length > 0) {
+                    this.elements.explanationList.innerHTML = '';
+                    data.explanation.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        this.elements.explanationList.appendChild(li);
+                    });
+                    this.elements.explanation.style.display = 'block';
+                }
+
+                // Предупреждения
+                if (data.warnings && data.warnings.length > 0) {
+                    this.elements.warnings.textContent = data.warnings.join('; ');
+                    this.elements.warnings.style.display = 'block';
+                }
+
+                // Специальные индикаторы
+                if (data.learned_from_openai) {
+                    const learnIndicator = document.createElement('div');
+                    learnIndicator.className = 'warning';
+                    learnIndicator.textContent = '🧠 Система изучила этот ответ для будущих запросов';
+                    this.elements.responseSection.appendChild(learnIndicator);
+                }
+
+                this.elements.responseSection.style.display = 'block';
+            }
+
+            displayLearningResult(data) {
+                const result = {
+                    answer: data.message,
+                    success: true,
+                    confidence: 1.0,
+                    source: 'learning',
+                    processing_time: data.processing_time,
+                    explanation: [
+                        `Добавлено узлов в граф: ${data.nodes_added}`,
+                        `Добавлено связей: ${data.edges_added}`
+                    ]
+                };
+                this.displayResponse(result);
+            }
+
+            displayError(message) {
+                const errorData = {
+                    answer: `❌ Ошибка: ${message}`,
+                    success: false,
+                    confidence: 0,
+                    source: 'error'
+                };
+                this.displayResponse(errorData);
+            }
+
+            updateStatsDisplay(stats) {
+                const pipeline = stats.pipeline_stats || {};
+                const components = stats.components_status || {};
+                
+                const statsData = [
+                    { label: 'Всего запросов', value: pipeline.total_queries || 0 },
+                    { label: 'Ответы из графа', value: pipeline.graph_responses || 0 },
+                    { label: 'Fallback OpenAI', value: pipeline.openai_fallbacks || 0 },
+                    { label: 'Сессий обучения', value: pipeline.learning_sessions || 0 },
+                    { label: 'Успешность графа', value: `${Math.round((pipeline.graph_success_rate || 0) * 100)}%` },
+                    { label: 'Статус памяти', value: components.memory?.status || 'Неизвестен' }
+                ];
+
+                this.elements.statsGrid.innerHTML = '';
+                statsData.forEach(stat => {
+                    const card = document.createElement('div');
+                    card.className = 'stat-card';
+                    card.innerHTML = `
+                        <div class="stat-value">${stat.value}</div>
+                        <div class="stat-label">${stat.label}</div>
+                    `;
+                    this.elements.statsGrid.appendChild(card);
+                });
+            }
+
+            getSourceText(source) {
+                const sourceMap = {
+                    'graph': 'Граф знаний',
+                    'openai_fallback': 'OpenAI Fallback',
+                    'error': 'Ошибка',
+                    'learning': 'Обучение'
+                };
+                return sourceMap[source] || source;
+            }
+
+            updateFeedbackSelection(feedback) {
+                document.querySelectorAll('.feedback-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                    if (parseInt(btn.dataset.feedback) === feedback) {
+                        btn.classList.add('selected');
+                    }
+                });
+            }
+
+            clearFeedbackSelection() {
+                document.querySelectorAll('.feedback-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+            }
+
+            setLoading(loading, buttonId = 'askBtn') {
+                const btn = buttonId === 'askBtn' ? this.elements.askBtn : this.elements.learnBtn;
+                const textSpan = btn.querySelector('.btn-text') || btn;
+                const loadingSpan = btn.querySelector('.loading');
+
+                if (loading) {
+                    btn.disabled = true;
+                    if (loadingSpan) {
+                        loadingSpan.style.display = 'inline-block';
+                        textSpan.style.display = 'none';
+                    } else {
+                        btn.innerHTML = '<span class="loading"></span>';
+                    }
+                } else {
+                    btn.disabled = false;
+                    if (loadingSpan) {
+                        loadingSpan.style.display = 'none';
+                        textSpan.style.display = 'inline';
+                    } else {
+                        btn.innerHTML = buttonId === 'askBtn' ? 'Спросить' : 'Обучить систему';
+                    }
+                }
+            }
+        }
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            new NeuroDesk();
+        });
+    </script>
+</body>
+</html>

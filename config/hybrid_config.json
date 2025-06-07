@@ -1,0 +1,425 @@
+{
+    "engine_name": "neurodesk_hybrid",
+    "description": "NeuroDesk Hybrid - Персональный ИИ-ассистент с гибридной архитектурой",
+    "version": "1.0.0",
+    "created": "2025-06-06",
+    
+    "system": {
+      "max_concurrent_requests": 10,
+      "enable_caching": true,
+      "cache_ttl": 600,
+      "enable_metrics": true,
+      "enable_health_checks": true,
+      "default_timeout": 30.0,
+      "circuit_breaker_threshold": 5,
+      "log_level": "INFO"
+    },
+    
+    "components": {
+      "semgraph": {
+        "type": "persistent",
+        "description": "Граф знаний с персистентным хранением",
+        "params": {
+          "file_path": "knowledge_graph_{user_id}.json",
+          "auto_save_interval": 300.0,
+          "max_nodes": 50000,
+          "max_edges": 100000,
+          "enable_compression": true,
+          "backup_count": 3
+        }
+      },
+      
+      "memory": {
+        "type": "biomorphic",
+        "description": "Биоморфная память с многоуровневой организацией",
+        "params": {
+          "stm_capacity": 150,
+          "ltm_capacity": 10000,
+          "working_memory_size": 50,
+          "consolidation_threshold": 0.7,
+          "forgetting_rate": 0.01,
+          "use_semantic_indexing": true,
+          "enable_episodic_memory": true
+        }
+      },
+      
+      "nlp": {
+        "type": "multilingual",
+        "description": "NLP процессор с поддержкой множественных языков",
+        "params": {
+          "language": "ru",
+          "fallback_language": "en",
+          "use_spacy": true,
+          "enable_entities": true,
+          "enable_relations": true,
+          "enable_sentiment": false,
+          "max_text_length": 10000,
+          "confidence_threshold": 0.5
+        }
+      },
+      
+      "contextvec": {
+        "type": "dynamic",
+        "description": "Динамические контекстные векторы",
+        "params": {
+          "vector_size": 384,
+          "use_indexing": true,
+          "similarity_threshold": 0.7,
+          "max_vectors": 10000,
+          "enable_clustering": true,
+          "update_frequency": "adaptive"
+        }
+      },
+      
+      "processor": {
+        "type": "graph_based",
+        "description": "Логический процессор на основе графа",
+        "params": {
+          "confidence_threshold": 0.3,
+          "max_inference_depth": 5,
+          "max_propagation_steps": 10,
+          "enable_explanations": true,
+          "reasoning_timeout": 10.0
+        }
+      }
+    },
+    
+    "pipelines": {
+      "hybrid_query": {
+        "description": "Гибридный конвейер запросов с OpenAI fallback",
+        "enabled": true,
+        "params": {
+          "min_confidence_threshold": 0.4,
+          "min_response_length": 20,
+          "max_response_length": 2000,
+          "enable_caching": true,
+          "cache_duration": 3600,
+          "rate_limiting": {
+            "enabled": true,
+            "max_requests_per_minute": 60,
+            "max_requests_per_hour": 1000
+          }
+        }
+      },
+      
+      "context_aware_learning": {
+        "description": "Контекстно-зависимое обучение",
+        "enabled": true,
+        "params": {
+          "max_learning_batch_size": 10,
+          "domain_weight_multiplier": 1.5,
+          "confidence_boost_factor": 0.2,
+          "enable_auto_consolidation": true
+        }
+      },
+      
+      "feedback_learning": {
+        "description": "Обучение через обратную связь",
+        "enabled": true,
+        "params": {
+          "feedback_weight": 0.3,
+          "positive_boost": 0.2,
+          "negative_penalty": 0.15,
+          "feedback_decay": 0.95,
+          "min_feedback_confidence": 0.1
+        }
+      }
+    },
+    
+    "external_apis": {
+      "openai": {
+        "description": "Интеграция с OpenAI API",
+        "enabled": true,
+        "params": {
+          "model": "gpt-4o-mini",
+          "fallback_model": "gpt-3.5-turbo",
+          "temperature": 0.7,
+          "max_tokens": 500,
+          "timeout": 30,
+          "retry_attempts": 3,
+          "retry_delay": 1.0,
+          "rate_limiting": {
+            "requests_per_minute": 50,
+            "tokens_per_minute": 40000
+          }
+        }
+      }
+    },
+    
+    "tuning": {
+      "genetic_algorithm": {
+        "description": "Генетический алгоритм для тюнинга параметров",
+        "enabled": true,
+        "params": {
+          "population_size": 1,
+          "mutation_rate": 0.1,
+          "crossover_rate": 0.0,
+          "elite_ratio": 0.2,
+          "max_iterations_without_improvement": 10,
+          "fitness_weights": {
+            "confidence": 0.4,
+            "response_time": 0.2,
+            "user_feedback": 0.3,
+            "learning_success": 0.1
+          }
+        }
+      }
+    },
+    
+    "monitoring": {
+      "metrics": {
+        "enabled": true,
+        "collection_interval": 60,
+        "retention_days": 30,
+        "export_format": "json"
+      },
+      
+      "health_checks": {
+        "enabled": true,
+        "check_interval": 30,
+        "failure_threshold": 3,
+        "recovery_threshold": 2
+      },
+      
+      "alerts": {
+        "enabled": false,
+        "email_notifications": false,
+        "thresholds": {
+          "response_time_ms": 5000,
+          "error_rate_percent": 5.0,
+          "memory_usage_percent": 80.0,
+          "openai_quota_usage_percent": 90.0
+        }
+      }
+    },
+    
+    "security": {
+      "input_validation": {
+        "enabled": true,
+        "max_input_length": 5000,
+        "forbidden_patterns": [
+          "SELECT.*FROM",
+          "DROP.*TABLE",
+          "<script",
+          "javascript:",
+          "eval\\("
+        ],
+        "sanitize_html": true
+      },
+      
+      "rate_limiting": {
+        "enabled": true,
+        "window_size_minutes": 15,
+        "max_requests_per_window": 100,
+        "max_learning_requests_per_window": 20,
+        "block_duration_minutes": 60
+      },
+      
+      "data_privacy": {
+        "encrypt_user_data": false,
+        "anonymize_logs": true,
+        "data_retention_days": 90,
+        "enable_user_data_export": true,
+        "enable_user_data_deletion": true
+      }
+    },
+    
+    "storage": {
+      "base_directory": "./data",
+      "session_directory": "./sessions",
+      "backup_directory": "./backups",
+      "log_directory": "./logs",
+      
+      "auto_backup": {
+        "enabled": true,
+        "interval_hours": 24,
+        "max_backups": 7,
+        "compress_backups": true
+      },
+      
+      "cleanup": {
+        "enabled": true,
+        "old_sessions_days": 30,
+        "old_logs_days": 14,
+        "old_backups_days": 30
+      }
+    },
+    
+    "performance": {
+      "optimization": {
+        "enable_lazy_loading": true,
+        "enable_component_pooling": false,
+        "enable_request_batching": false,
+        "batch_size": 5,
+        "batch_timeout_ms": 100
+      },
+      
+      "memory_management": {
+        "max_memory_usage_mb": 2048,
+        "gc_threshold": 0.8,
+        "enable_memory_profiling": false
+      },
+      
+      "caching": {
+        "response_cache_size": 1000,
+        "component_cache_size": 100,
+        "vector_cache_size": 5000,
+        "cache_cleanup_interval": 3600
+      }
+    },
+    
+    "development": {
+      "debug_mode": false,
+      "verbose_logging": false,
+      "enable_profiling": false,
+      "mock_external_apis": false,
+      
+      "testing": {
+        "enable_test_mode": false,
+        "test_data_directory": "./test_data",
+        "mock_openai_responses": false
+      }
+    },
+    
+    "domains": {
+      "default_weights": {
+        "general": 1.0,
+        "programming": 1.2,
+        "science": 1.1,
+        "technology": 1.2,
+        "medicine": 1.3,
+        "education": 1.0,
+        "business": 1.0,
+        "arts": 0.9
+      },
+      
+      "domain_specific_settings": {
+        "programming": {
+          "confidence_boost": 0.1,
+          "specialized_entities": ["library", "framework", "algorithm", "function"],
+          "code_detection": true
+        },
+        
+        "science": {
+          "confidence_boost": 0.15,
+          "specialized_entities": ["theory", "experiment", "hypothesis", "research"],
+          "enable_formula_parsing": false
+        },
+        
+        "medicine": {
+          "confidence_boost": 0.2,
+          "specialized_entities": ["symptom", "diagnosis", "treatment", "medication"],
+          "require_high_confidence": true,
+          "disclaimer_required": true
+        }
+      }
+    },
+    
+    "internationalization": {
+      "default_language": "ru",
+      "supported_languages": ["ru", "en", "de", "fr", "es"],
+      "auto_detect_language": true,
+      "translation_fallback": true
+    },
+    
+    "experimental": {
+      "features": {
+        "multimodal_input": false,
+        "voice_interaction": false,
+        "image_understanding": false,
+        "code_execution": false,
+        "real_time_learning": true,
+        "collaborative_filtering": false
+      },
+      
+      "advanced_reasoning": {
+        "enable_chain_of_thought": true,
+        "enable_self_reflection": false,
+        "enable_meta_learning": false,
+        "reasoning_depth_limit": 3
+      }
+    },
+    
+    "integration": {
+      "webhooks": {
+        "enabled": false,
+        "endpoints": [],
+        "authentication_required": true
+      },
+      
+      "external_knowledge_bases": {
+        "enabled": false,
+        "sources": [],
+        "update_frequency": "daily"
+      },
+      
+      "plugins": {
+        "enabled": false,
+        "directory": "./plugins",
+        "auto_load": false
+      }
+    },
+    
+    "quality_assurance": {
+      "response_validation": {
+        "enabled": true,
+        "min_response_quality": 0.3,
+        "max_hallucination_risk": 0.7,
+        "enable_fact_checking": false
+      },
+      
+      "learning_validation": {
+        "enabled": true,
+        "min_learning_quality": 0.4,
+        "validate_new_knowledge": true,
+        "prevent_contradictions": true
+      },
+      
+      "feedback_analysis": {
+        "enabled": true,
+        "min_feedback_count": 3,
+        "feedback_weight_decay": 0.9,
+        "enable_sentiment_analysis": false
+      }
+    },
+    
+    "user_experience": {
+      "response_formatting": {
+        "max_response_length": 2000,
+        "enable_markdown": true,
+        "enable_code_highlighting": true,
+        "enable_math_rendering": false
+      },
+      
+      "personalization": {
+        "remember_preferences": true,
+        "adapt_to_expertise_level": true,
+        "customize_explanations": true,
+        "track_learning_progress": true
+      },
+      
+      "accessibility": {
+        "screen_reader_support": true,
+        "high_contrast_mode": false,
+        "large_text_mode": false,
+        "keyboard_navigation": true
+      }
+    },
+    
+    "analytics": {
+      "usage_tracking": {
+        "enabled": true,
+        "track_query_patterns": true,
+        "track_learning_effectiveness": true,
+        "track_user_satisfaction": true,
+        "anonymize_data": true
+      },
+      
+      "performance_metrics": {
+        "track_response_times": true,
+        "track_accuracy": true,
+        "track_resource_usage": true,
+        "generate_reports": false
+      }
+    }
+  }
